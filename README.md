@@ -4,7 +4,7 @@ This repo contains code for the backend and GUI of an obituary parser that takes
 
 The parser can be used for activists, journalists, and other interested parties to collect casualty information from OSINT data.
 
-_To launch the parser:_ 
-- download and unzip the source files
-- in Terminal, cd into the `obit-parser` folder
-- run `python Obit_Parser.py` and start pasting obits
+__To launch the parser:__ 
+- download and unzip the source files,
+- in Terminal, cd into the `obit-parser` folder,
+- run `python Obit_Parser.py` and start pasting obits.
