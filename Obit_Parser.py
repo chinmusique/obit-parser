@@ -3,6 +3,9 @@ from io import StringIO
 from tkinter import *
 from tkinter import scrolledtext
 import datetime as datetime
+import json
+import re
+import sys
 
 from natasha import (
     Segmenter,
@@ -48,6 +51,12 @@ def raw_to_date(raw_date):
 
     return(datetime.date(year, month, day))
 
+def get_dates(text):
+  dates = []
+  matches = dates_extractor(text)
+  date_list = [raw_to_date(date.fact.as_json) for date in matches]
+  return date_list
+
 def birthdate(date_list):
     try:
         if min(date_list) < datetime.date(2004, 1, 1):
@@ -66,30 +75,22 @@ def deathdate(date_list):
     except:
         return 'дата смерти: не указана'
 
+def find_ranks(doc):
+    ranks_dict = json.load(open("ranks_dict.json"))
+    ranks = []
+    replacements_ranks = [
+        ('младш[а-я]+', 'младший'),
+        ('старш.[^н]', 'старший'),
+        ('\s|-|\n', '')]
 
-def find_titles(doc):
-    titles = ['сержант',
-              'лейтенант',
-              'гвардии лейтенант',
-              'старшина',
-              'ефрейтор',
-              'рядовой',
-              'доброволец',
-              'старший матрос',
-              'полковник',
-              'ефрейтор',
-              'подполковник',
-              'прапорщик']
+    for old, new in replacements_ranks:
+        text = re.sub(old, new, doc.text.lower())
+    for key in ranks_dict.keys():
+        if re.search(key, text):
+            ranks.append(ranks_dict[key])
+    if len(ranks) > 0:
 
-    titles_per = []
-    for token in doc.tokens:
-        token.lemmatize(morph_vocab)
-        if token.lemma in titles:
-            titles_per.append(token.lemma)
-
-    if len(titles_per) > 0:
-
-        return f"звание: {', '.join(titles_per)}"
+        return f"звание: {', '.join(list(set(ranks)))}"
     else:
         return "звание не указано"
 
@@ -97,7 +98,8 @@ def find_names(spans):
     names = []
     for span in spans:
         if span.type == PER:
-            names.append(span.normal)
+            if len(span.normal.strip().split(' ')) > 1:
+                names.append(span.normal)
     return set(names)
 
 def parse_occupation(oc):
@@ -141,12 +143,10 @@ def parse_text(text):
     annot_text = my_result.getvalue()
 
     # get dates
-    dates = []
-    matches = dates_extractor(text)
-    date_list = [raw_to_date(date.fact.as_json) for date in matches]
+    date_list = get_dates(text)
 
     # get title
-    titles = find_titles(doc)
+    ranks = find_ranks(doc)
 
     # get names
     names = find_names(doc.spans)
@@ -154,7 +154,8 @@ def parse_text(text):
     # get occupations
     occups = find_occupations(doc)
 
-    return annot_text, birthdate(date_list), deathdate(date_list), titles, f"имя: {', '.join(names)}", occups
+
+    return annot_text, birthdate(date_list), deathdate(date_list), ranks, f"имя: {', '.join(names)}", occups
 
 def initialize_gui():
     window = Tk()
