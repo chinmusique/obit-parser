@@ -6,6 +6,6 @@ The parser can be used for activists, journalists, and other interested parties 
 
 __To launch the parser:__ 
 - download and unzip the source files,
-- install necessary packages,
 - in Terminal, cd into the `obit-parser` folder,
+- install necessary packages with `pip install -r requirements.txt`,
 - run `python Obit_Parser.py` and start pasting obits.
