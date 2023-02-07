@@ -3,3 +3,8 @@
 This repo contains code for the backend and GUI of an obituary parser that takes as input social media posts in Russian and outputs key attributes such as name, date and place of death, date and place of burial, military rank, etc.
 
 The parser can be used for activists, journalists, and other interested parties to collect casualty information from OSINT data.
+
+_To launch the parser:_ 
+- download and unzip the source files
+- in Terminal, cd into the `obit-parser` folder
+- run `python Obit_Parser.py` and start pasting obits
